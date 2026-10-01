@@ -1,0 +1,15 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.34,<1
+pydantic-settings>=2.8,<3
+httpx>=0.28,<1
+firebase-admin>=6.7,<8
+google-auth>=2.38,<3
+CacheControl>=0.14,<1
+requests>=2.32,<3
+cryptography>=44,<47
+PyJWT[crypto]>=2.10,<3
+livekit-api>=1.0,<2
+livekit-agents[google,silero]>=1.8.2,<2
+python-dotenv>=1.0,<2
+tzdata>=2025.1
+pytest>=8,<10

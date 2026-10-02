@@ -13,3 +13,4 @@ livekit-agents[google,silero]>=1.8.2,<2
 python-dotenv>=1.0,<2
 tzdata>=2025.1
 pytest>=8,<10
+google-adk>=1.0,<2

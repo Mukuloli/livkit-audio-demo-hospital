@@ -52,6 +52,11 @@ class ToolCall(BaseModel):
     arguments: dict = Field(default_factory=dict)
 
 
+class ChatMessage(BaseModel):
+    message: str = Field(min_length=1, max_length=2000)
+    session_id: str = Field(min_length=1, max_length=100)
+
+
 @app.get('/health')
 def health():
     storage = {'firestore': 'firestore', 'firestore_calendar': 'firestore+google-calendar-invites',
@@ -68,6 +73,27 @@ def configuration():
             'voice_pipeline': settings.voice_pipeline, 'clinic_timezone': settings.clinic_timezone,
             'booking_mode': settings.booking_mode, 'calendar_invitations_enabled': settings.calendar_invitations_enabled,
             'doctors': doctors}
+
+
+@app.post('/chat')
+async def chat_endpoint(body: ChatMessage, patient: Patient = Depends(current_patient)):
+    """Text chat with Noor via Google ADK — same Firestore DB as voice agent."""
+    import logging
+    log = logging.getLogger('noor.chat_api')
+    log.info('[CHAT IN] uid=%s session=%s message=%s', patient.uid, body.session_id, body.message[:120])
+    try:
+        from .chat_agent import chat
+        reply = await chat(
+            uid=patient.uid,
+            session_id=body.session_id,
+            message=body.message,
+            service=app.state.service,
+        )
+        log.info('[CHAT OUT] uid=%s reply=%s', patient.uid, reply[:120])
+        return {'ok': True, 'reply': reply}
+    except Exception as exc:
+        log.exception('[CHAT ERROR] %s', exc)
+        raise HTTPException(500, 'Chat agent error. Please try again.') from exc
 
 
 @app.post('/auth/demo')

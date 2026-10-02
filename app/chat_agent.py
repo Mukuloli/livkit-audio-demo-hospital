@@ -192,11 +192,10 @@ async def chat(uid: str, session_id: str, message: str, service) -> str:
 
     # Reuse or create session so conversation history is preserved
     adk_session_id = f'chat-{uid}-{session_id}'
-    try:
-        await _session_service.get_session(
-            app_name=APP_NAME, user_id=uid, session_id=adk_session_id
-        )
-    except Exception:
+    session = await _session_service.get_session(
+        app_name=APP_NAME, user_id=uid, session_id=adk_session_id
+    )
+    if session is None:
         await _session_service.create_session(
             app_name=APP_NAME, user_id=uid, session_id=adk_session_id
         )
